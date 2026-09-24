@@ -37,6 +37,22 @@ Rules:
   // <html className={inter.variable}>
   ```
 
+- **Vite / non-Next projects** have no `next/font`. Install the variable font
+  from npm and expose it as `--font-sans`; never `@import` a Google Fonts URL:
+
+  ```bash
+  npm i @fontsource-variable/inter
+  ```
+
+  ```ts
+  // main.tsx
+  import "@fontsource-variable/inter";
+  ```
+
+  ```css
+  :root { --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif; }
+  ```
+
 - **Verify it landed.** If the dashboard renders in a system stack,
   `--font-sans` was never set:
 

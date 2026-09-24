@@ -145,19 +145,36 @@ Cause: you copied Foglamp's whole `globals.css`, which carries monorepo paths
 Fix: remove them, or repoint at this project:
 `@source "../app/**/*.{ts,tsx}";`. Do not add `@source` for node_modules.
 
-### A colored Badge or `shadow-(--custom-shadow-*)` has no shadow
+### The theme looks right but is not the real one
 
-Symptom: colored chips/badges render with no edge shadow; some
-`--custom-shadow-*` tokens read as empty.
+Symptom (any one of): colored badges/chips have no shadow;
+`--custom-shadow-rose` / `--custom-shadow-slate` read empty; squircle corners
+never apply; `dark:` utilities ignore a toggled `.dark` class (only the OS
+preference changes them); the `shimmer` keyframes are missing.
 
-Cause: the theme was not installed verbatim — an older snapshot, or a
-hand-copied token block that dropped tokens.
+Cause: the theme was hand-copied instead of installed. A hand-written theme
+typically drops `@plugin "@toolwind/corner-shape"`, `@custom-variant dark`,
+`@custom-variant squircle`, the keyframes, and the `rose`/`slate` shadow tokens.
 
-Fix: reinstall the `theme` item, then confirm they resolve:
+Fix: reinstall the `theme` item verbatim. Then confirm:
 
 ```js
-getComputedStyle(document.documentElement).getPropertyValue("--custom-shadow-rose");
+const s = getComputedStyle(document.documentElement);
+s.getPropertyValue("--custom-shadow-rose"); // must be non-empty
 ```
+
+Toggle `.dark` and check a `dark:` utility actually changes — there must be
+class-driven dark selectors, not only `prefers-color-scheme` rules.
+
+### Components are plain `<div>`s, not the real primitives
+
+Symptom: buttons/badges lack their base behavior (focus ring, `has-[>svg]`
+padding, state merging), and `package.json` has no `@base-ui/react`.
+
+Cause: the components were re-authored from memory instead of installed.
+
+Fix: delete them and copy `registry/ui/<name>.tsx` verbatim. The real ones
+import `useRender`/`mergeProps` from `@base-ui/react`.
 
 ### Animations do nothing (`animate-in`, `fade-in`, …)
 

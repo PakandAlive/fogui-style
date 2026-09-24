@@ -64,9 +64,29 @@ Then, in order:
    `--font-host-grotesk`. See `references/typography.md`.
 4. **Verify both themes.** Every screen must look correct in light and dark.
 
-Do not hand-port tokens from memory — install the `theme` item. If a step does
-not behave as described, read `references/troubleshooting.md` before debugging
-from scratch.
+Do not hand-port tokens and do not re-author components — install the items.
+
+### If the CLI cannot run (offline, blocked network)
+
+Copy the files verbatim from
+`https://raw.githubusercontent.com/PakandAlive/fogui-style/main/registry/...`,
+keeping names and paths:
+
+- `theme/foglamp-theme.css` → your global CSS, imported right after Tailwind
+- `ui/<name>.tsx` → your `ui` alias
+- `lib/utils.ts` → `@/lib/utils.ts`; `hooks/use-mobile.ts` → `@/hooks/use-mobile.ts`
+
+### Verify the install landed
+
+- **Components are real.** They import from `@base-ui/react` (`useRender`,
+  `mergeProps`). Plain `<div>` + `React.HTMLAttributes` means they were
+  re-authored — replace them with the registry files.
+- **The theme is real.** It contains `@plugin "@toolwind/corner-shape"`,
+  `@custom-variant dark`, `@custom-variant squircle`, and every
+  `--custom-shadow-*` including `rose` and `slate`.
+
+If a step does not behave as described, read `references/troubleshooting.md`
+before debugging from scratch.
 
 ## Decision flow
 
