@@ -28,6 +28,14 @@ npx shadcn@latest add PakandAlive/fogui-style/button
 npx shadcn@latest add PakandAlive/fogui-style/sidebar
 ```
 
+`theme` installs a self-contained `foglamp-theme.css` (into
+`@lib/foglamp-theme.css`). Import it once, right after Tailwind:
+
+```css
+@import "tailwindcss";
+@import "./foglamp-theme.css"; /* adjust to where the file landed */
+```
+
 Pin a ref for reproducibility:
 
 ```bash
@@ -47,7 +55,7 @@ npx shadcn@latest add PakandAlive/fogui-style/button --dry-run
 
 | Item | Type | Contents |
 | --- | --- | --- |
-| `theme` | `registry:style` | 50 light + 49 dark CSS variables (color, sidebar, chart, 18 shadow tokens), `@custom-variant` dark + squircle, `@plugin @toolwind/corner-shape`, shimmer keyframes |
+| `theme` | `registry:file` | One self-contained CSS file: 50 light + 49 dark CSS variables (color, sidebar, chart, 18 shadow tokens), the `@theme inline` mappings, `@custom-variant` dark + squircle, `@plugin @toolwind/corner-shape`, shimmer keyframes |
 | `utils` | `registry:lib` | `cn()` — clsx + tailwind-merge |
 | `use-mobile` | `registry:hook` | `useIsMobile()` |
 | 56 primitives | `registry:ui` | Every component in `registry/ui/` |
@@ -62,9 +70,10 @@ and installs into the consumer's configured `@ui/` / `@lib/` / `@hooks/` aliases
 - **Tailwind v4** with shadcn initialized (`components.json`).
 - **Base UI**, not Radix. Foglamp primitives use `@base-ui/react` and the Base UI
   `render` prop. Radix's `asChild` will not work.
-- The `@theme inline` block in `globals.css` that maps `--color-*` to your
-  variables (created by `shadcn init`). The `theme` item sets variable values; it
-  does not create the mappings.
+- A `@import "tailwindcss";` in your global CSS. The `theme` item ships its own
+  `@theme inline` mappings, tokens, and variants, so it does not depend on the
+  default CSS block from `shadcn init`. Ordering matters: the theme import must
+  come after the Tailwind import.
 - Chromium gets true squircle corners via `@toolwind/corner-shape`; other
   browsers fall back to plain rounding by design.
 
@@ -76,13 +85,15 @@ and installs into the consumer's configured `@ui/` / `@lib/` / `@hooks/` aliases
    classes. If classes are missing, this is the first thing to check.
 2. **Fonts are not shipped.** Inter is self-hosted in Foglamp. Wire your own
    `--font-sans` / `--font-heading` in `@theme inline`. See `DESIGN.md` §5.
-3. **Complex CSS fallback.** The `theme` item expresses tokens as `cssVars` and
-   the squircle/plugin/keyframes as `css`. If a CLI version drops any of it, a
-   byte-faithful copy lives at `registry/theme/foglamp-theme.css` — `@import` it
-   after `@import "tailwindcss"` instead.
-4. **`registry:style` merges into your CSS.** The `theme` item is not a
-   side-by-side drop-in; it deliberately sets your semantic tokens. Install it
-   into a project whose design you intend to replace.
+3. **The theme is a file, not a merge.** `theme` is `registry:file`: it drops
+   `foglamp-theme.css` into the project and you `@import` it. This is deliberate.
+   shadcn's `registry:style` + `cssVars` path is unreliable here — its keys are
+   not `--`-prefixed, it never overwrites tokens the project already has, and it
+   emits invalid `var(----custom-shadow)` for Foglamp's non-color shadow tokens.
+   Shipping the whole CSS file is byte-faithful and order-independent.
+4. **Token collisions are on you.** Because the theme file defines `--background`,
+   `--primary`, etc. in `:root` / `.dark`, importing it overrides those tokens —
+   that is the point. Import it last if you need to layer your own values on top.
 
 ## Self-contained, with an optional sync
 
@@ -99,10 +110,10 @@ node scripts/sync-from-foglamp.mjs --source /path/to/foglamp/packages/ui
 ```
 
 It rewrites `@foglamp/ui/*` imports to portable `@/lib/*` and
-`@/components/ui/*` aliases, extracts npm and registry dependencies, parses the
-`:root` / `.dark` blocks out of `globals.css` into `cssVars`, and regenerates
-`registry/ui/`, `registry/lib/`, `registry/hooks/`, `registry/theme/`, and
-`registry.json`. **It overwrites local edits to those paths** — commit before
+`@/components/ui/*` aliases, extracts npm and registry dependencies, assembles a
+self-contained `registry/theme/foglamp-theme.css` (tokens + `@theme inline` +
+variants + keyframes), and regenerates `registry/ui/`, `registry/lib/`,
+`registry/hooks/`, `registry/theme/`, and `registry.json`. **It overwrites local edits to those paths** — commit before
 syncing.
 
 Validate before pushing:

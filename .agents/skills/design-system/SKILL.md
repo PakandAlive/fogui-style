@@ -50,15 +50,19 @@ npx shadcn@latest add PakandAlive/fogui-style/badge
 
 Then, in order:
 
-1. **Fix `@source`.** Foglamp's `globals.css` contains monorepo paths
+1. **Import the theme.** `theme` ships a self-contained `foglamp-theme.css`; add
+   `@import "./foglamp-theme.css";` (adjust the path) right after
+   `@import "tailwindcss";` in your global CSS. It carries the tokens, the
+   `@theme inline` mappings, the squircle variant, and the keyframes.
+2. **Fix `@source`.** Foglamp's `globals.css` contains monorepo paths
    (`@source "../../../apps/**/*.{ts,tsx}"`). Remove them or repoint them at the
    target project. If you skip this, Tailwind generates no classes.
-2. **Wire fonts** (see `DESIGN.md` §5). Self-host Inter; add the
+3. **Wire fonts** (see `DESIGN.md` §5). Self-host Inter; add the
    `--font-sans` / `--font-heading` mapping in `@theme inline`.
-3. **Install npm deps** declared by the installed items (`@base-ui/react`,
+4. **Install npm deps** declared by the installed items (`@base-ui/react`,
    `@tabler/icons-react`, `@toolwind/corner-shape`, `class-variance-authority`,
-   `clsx`, `tailwind-merge`, `tw-animate-css`, `cn`).
-4. **Verify both themes.** Every screen must look correct in light and dark.
+   `clsx`, `tailwind-merge`, `tw-animate-css`).
+5. **Verify both themes.** Every screen must look correct in light and dark.
 
 Do not hand-port tokens from memory — install the `theme` item. If you must copy
 manually, copy verbatim from `registry/theme/foglamp-theme.css`.
@@ -80,4 +84,4 @@ manually, copy verbatim from `registry/theme/foglamp-theme.css`.
 - `references/colors.md` — full token tables (base, sidebar, chart, badge accents).
 - `references/shadows.md` — every shadow token and its role.
 - Repo root `DESIGN.md` — complete system, anti-pattern table, replication steps.
-- Repo root `FRONTEND.md` — framework-level conventions (routing, data, forms).
+- Repo root `registry/README.md` — item map, target-project requirements, caveats.

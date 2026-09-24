@@ -37,6 +37,13 @@ npx shadcn@latest add PakandAlive/fogui-style/button
 npx shadcn@latest add PakandAlive/fogui-style/sidebar
 ```
 
+`theme` lands a self-contained `foglamp-theme.css`; import it once after Tailwind:
+
+```css
+@import "tailwindcss";
+@import "./foglamp-theme.css"; /* adjust to where the file landed */
+```
+
 Then read `DESIGN.md` (or load the skill) before writing UI. The four laws:
 
 1. Near-monochrome base; color only in badge variants.

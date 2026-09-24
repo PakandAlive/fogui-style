@@ -123,8 +123,8 @@ chrome. Each variant pairs a Tailwind `500` tint with a `700` (light) / `300`
 | `sky` | `sky-500/10` | `sky-700` | `sky-300` |
 
 Rule: pair the `500` tint with its `100`/`950`-range text so it reads in **both**
-modes (see `FRONTEND.md`). Never invent a new hue outside this list without
-adding a shadow token for it.
+modes. Never invent a new hue outside this list without adding a shadow token
+for it.
 
 ### 2.5 Allowed and banned palettes
 
@@ -378,7 +378,7 @@ from §2.4, and `outline`. Each carries its matching shadow token.
 
 Sizes (3): `sm h-4 text-[10px]`, `md h-5 text-xs`, `lg h-6 text-sm`.
 
-Add an icon alongside the text where it clarifies state (`FRONTEND.md`).
+Add an icon alongside the text where it clarifies state.
 
 ### 7.4 Other primitives — noteworthy conventions
 
@@ -446,23 +446,29 @@ npx shadcn@latest add PakandAlive/fogui-style/theme
 npx shadcn@latest add PakandAlive/fogui-style/utils
 ```
 
+`theme` is a file item: it drops a self-contained `foglamp-theme.css` into the
+project. Import it once, right after Tailwind:
+
+```css
+@import "tailwindcss";
+@import "./foglamp-theme.css"; /* adjust to where the file landed */
+```
+
 Manual path, if you copy instead of install:
 
 1. Copy `registry/theme/foglamp-theme.css` into the target project and `@import`
-   it after `@import "tailwindcss"`. It carries the `:root` / `.dark` tokens, the
-   `@custom-variant` dark and squircle declarations, the `@plugin`, and the
-   `shimmer` keyframes.
-2. Copy the `@theme inline` mapping (the `--color-*: var(--*)` block) from a
-   shadcn-initialized `globals.css`.
-3. Copy the `@layer base` block (body tokens, thin scrollbars, autofill fix).
-4. Install deps: `@base-ui/react`, `@tabler/icons-react`,
+   it after `@import "tailwindcss"`. It is self-contained: the `:root` / `.dark`
+   tokens, the `@theme inline` mappings, the `@custom-variant` dark and squircle
+   declarations, the `@plugin`, and the `shimmer` keyframes.
+2. Copy the `@layer base` block (body tokens, thin scrollbars, autofill fix).
+3. Install deps: `@base-ui/react`, `@tabler/icons-react`,
    `@toolwind/corner-shape`, `class-variance-authority`, `clsx`,
-   `tailwind-merge`, `tw-animate-css`, `cn`, plus per-component deps (see
+   `tailwind-merge`, `tw-animate-css`, plus per-component deps (see
    `registry.json`).
-5. Set up fonts (§5). Inter should be self-hosted.
-6. **Rewrite `@source`.** If your `globals.css` carries monorepo `@source`
+4. Set up fonts (§5). Inter should be self-hosted.
+5. **Rewrite `@source`.** If your `globals.css` carries monorepo `@source`
    paths, repoint them at the target project, or Tailwind will not scan the app.
-7. Copy component files from `registry/ui/`; their imports already use
+6. Copy component files from `registry/ui/`; their imports already use
    `@/lib/utils` and `@/components/ui/*`, which the shadcn CLI (or your own
    aliases) resolve.
 
