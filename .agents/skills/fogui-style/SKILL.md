@@ -64,7 +64,9 @@ Then, in order:
    `--font-host-grotesk`. See `references/typography.md`.
 4. **Verify both themes.** Every screen must look correct in light and dark.
 
-Do not hand-port tokens from memory — install the `theme` item.
+Do not hand-port tokens from memory — install the `theme` item. If a step does
+not behave as described, read `references/troubleshooting.md` before debugging
+from scratch.
 
 ## Decision flow
 
@@ -85,6 +87,7 @@ Do not hand-port tokens from memory — install the `theme` item.
 
 Read the one a task points at; each is self-contained.
 
+- `references/troubleshooting.md` — known pitfalls, symptom → cause → fix. Check first.
 - `references/colors.md` — token tables (base, sidebar, chart, badge accents).
 - `references/shadows.md` — every shadow token, its values, and the border rule.
 - `references/typography.md` — the three faces and where each is allowed.
