@@ -14,9 +14,10 @@ files under `registry/` are the source of truth, not a build artifact.
 | --- | --- |
 | `DESIGN.md` | The authoritative design-system document — philosophy, color, shadows, radii, type, icons, component matrix, anti-patterns. |
 | `.agents/skills/design-system/` | An agent skill that enforces the rules when building UI (`SKILL.md` + color/shadow references). |
-| `registry.json` | A shadcn GitHub registry — 59 items (theme, utils, use-mobile, 56 primitives). |
+| `registry.json` | A shadcn GitHub registry — 61 items (theme, marketing, utils, use-mobile, 56 primitives, `noise-overlay`). |
 | `registry/theme/foglamp-theme.css` | The theme layer: tokens, shadows, squircle variant, keyframes. |
-| `registry/ui/`, `registry/lib/`, `registry/hooks/` | Distributable components, `cn()`, and hooks. |
+| `registry/theme/foglamp-marketing.css` | The marketing layer: `font-display` (Host Grotesk), fog drift keyframes, `.fog-layer`. |
+| `registry/ui/`, `registry/lib/`, `registry/hooks/` | Distributable components (incl. `noise-overlay`), `cn()`, and hooks. |
 | `scripts/sync-from-foglamp.mjs` | Optional tool to pull upstream changes from the Foglamp repo. |
 
 ## Use it
@@ -28,6 +29,10 @@ Tailwind v4 + shadcn + Base UI:
 # Color system, shadows, radii, squircle variant, motion keyframes
 npx shadcn@latest add PakandAlive/fogui-style/theme
 
+# Marketing layer (font-display + fog drift) and its textures
+npx shadcn@latest add PakandAlive/fogui-style/marketing
+npx shadcn@latest add PakandAlive/fogui-style/noise-overlay
+
 # cn() and a hook
 npx shadcn@latest add PakandAlive/fogui-style/utils
 npx shadcn@latest add PakandAlive/fogui-style/use-mobile
@@ -37,11 +42,13 @@ npx shadcn@latest add PakandAlive/fogui-style/button
 npx shadcn@latest add PakandAlive/fogui-style/sidebar
 ```
 
-`theme` lands a self-contained `foglamp-theme.css`; import it once after Tailwind:
+`theme` and `marketing` land self-contained CSS files; import them once after
+Tailwind (`marketing` after `theme`):
 
 ```css
 @import "tailwindcss";
-@import "./foglamp-theme.css"; /* adjust to where the file landed */
+@import "./foglamp-theme.css"; /* adjust to where the files landed */
+@import "./foglamp-marketing.css";
 ```
 
 Then read `DESIGN.md` (or load the skill) before writing UI. The four laws:

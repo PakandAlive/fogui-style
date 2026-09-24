@@ -1,0 +1,110 @@
+"use client";
+
+import { cn } from "@/lib/utils";
+
+// Shared atmospheric textures for marketing sections. Two flavors:
+// - FilmGrain: a static feTurbulence speckle applied to the element itself via
+//   CSS filter (the hero's treatment). Opacity/blend come from the caller.
+// - FogBank: a fractal-noise haze rendered into a rect, used by the CTA fog
+//   and the footer band. Deterministic (fixed seed) so it's SSR-safe.
+
+export function FilmGrain({
+	id,
+	className,
+}: {
+	/** Unique per page, since SVG filter ids are document-global. */
+	id: string;
+	className?: string;
+}) {
+	return (
+		<figure
+			aria-hidden="true"
+			className={cn("pointer-events-none absolute inset-0", className)}
+			style={{ filter: `url(#${id}) grayscale(100%)` }}
+		>
+			<svg>
+				<filter id={id}>
+					<feTurbulence baseFrequency="0.8" />
+				</filter>
+			</svg>
+		</figure>
+	);
+}
+
+// The fog takes its color from CSS: the turbulence only supplies alpha, and an
+// feFlood paints it. The flood color is set as a CSS property with a light
+// and a dark value, so one FogBank is a mid grey on the light theme and a
+// grey-blue on the dark one. Not currentColor: WebKit does not resolve it for
+// flood-color, and the fog vanished in Safari when it did.
+const NOISE_TO_ALPHA =
+	"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.6 0.04";
+
+export function FogBank({
+	id,
+	freq,
+	seed,
+	octaves = 4,
+}: {
+	id: string;
+	freq: number;
+	seed: number;
+	octaves?: number;
+}) {
+	return (
+		<div aria-hidden className="absolute inset-0 overflow-hidden">
+			{/* The turbulence is rasterized at quarter resolution and scaled up 4x.
+          It sits behind 12-24px of blur everywhere it's used, so the upscale
+          is invisible, and the filter costs 1/16th to render. */}
+			<svg
+				className="absolute left-0 top-0 h-1/4 w-1/4 origin-top-left scale-[4.02]"
+				aria-hidden
+				preserveAspectRatio="none"
+			>
+				<filter id={id} x="-20%" y="-20%" width="140%" height="140%">
+					{/* The turbulence frequency is in raster pixels: at quarter size the
+              pattern needs 4x the frequency to look the same once scaled. */}
+					<feTurbulence
+						type="fractalNoise"
+						baseFrequency={freq * 4}
+						numOctaves={octaves}
+						seed={seed}
+						stitchTiles="stitch"
+						result="noise"
+					/>
+					{/* Single-line `values`: the browser normalises this SVG attribute
+              to single spaces; a multi-line string mismatches on hydration. */}
+					<feColorMatrix
+						in="noise"
+						type="matrix"
+						values={NOISE_TO_ALPHA}
+						result="alpha"
+					/>
+					<feFlood
+						className="[flood-color:#6b7078] dark:[flood-color:#333639]"
+						result="tint"
+					/>
+					<feComposite in="tint" in2="alpha" operator="in" />
+				</filter>
+				<rect width="100%" height="100%" filter={`url(#${id})`} />
+			</svg>
+		</div>
+	);
+}
+
+// The landing hero's grain treatment, shared by the product-page heroes:
+// the film grain over the whole section, fading out toward the bottom so the
+// texture ends with the content instead of cutting at the section edge.
+export function HeroGrain({ id }: { id: string }) {
+	return (
+		<div
+			aria-hidden
+			className="pointer-events-none absolute inset-0 -z-10"
+			style={{
+				WebkitMaskImage: "linear-gradient(to top, #000 78%, transparent 97%)",
+				maskImage: "linear-gradient(to top, #000 78%, transparent 97%)",
+			}}
+		>
+			<FilmGrain id={id} className="opacity-15 mix-blend-screen" />
+		</div>
+	);
+}

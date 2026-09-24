@@ -58,6 +58,21 @@ if (!existsSync(UI_SRC)) {
 	process.exit(1);
 }
 
+/**
+ * 解析上游 web app 源目录：--web > FOGLAMP_WEB_SRC > 默认从 UI_SRC 推导。
+ * marketing 层（字体显示面、雾气动效与纹理组件）位于 apps/web，而非 packages/ui。
+ */
+function resolveWebSource() {
+	const flag = process.argv.indexOf("--web");
+	const raw =
+		(flag !== -1 && process.argv[flag + 1]) ||
+		process.env.FOGLAMP_WEB_SRC ||
+		resolve(UI_SRC, "../../../apps/web/src");
+	return resolve(raw);
+}
+
+const WEB_SRC = resolveWebSource();
+
 const OUT = join(ROOT, "registry");
 const GITHUB = "PakandAlive/fogui-style";
 
@@ -121,6 +136,22 @@ function extractBlock(css, selector) {
 	return "";
 }
 
+/** 提取整块 "@keyframes <name> { ... }"（含花括号），保留原格式。 */
+function extractKeyframes(css, name) {
+	const match = new RegExp(`@keyframes\\s+${name}\\s*\\{`).exec(css);
+	if (!match) return "";
+	const start = match.index;
+	let depth = 0;
+	for (let i = match.index + match[0].length - 1; i < css.length; i++) {
+		if (css[i] === "{") depth++;
+		else if (css[i] === "}") {
+			depth--;
+			if (depth === 0) return css.slice(start, i + 1);
+		}
+	}
+	return "";
+}
+
 // ---------------------------------------------------------------------------
 // 1. 组件
 // ---------------------------------------------------------------------------
@@ -130,10 +161,11 @@ const componentFiles = readdirSync(componentsDir).filter((f) => f.endsWith(".tsx
 rmSync(join(OUT, "ui"), { recursive: true, force: true });
 mkdirSync(join(OUT, "ui"), { recursive: true });
 
-const componentItems = [];
-for (const file of componentFiles) {
-	const name = basename(file, ".tsx");
-	const src = readFileSync(join(componentsDir, file), "utf8");
+/**
+ * 由一个 TSX 源生成 registry:ui item：改写 import、落盘并解析依赖。
+ * 组件用到语义 token 与阴影，因此一律声明对 theme 的依赖。
+ */
+function uiItem({ name, file, src, description }) {
 	const rewritten = rewriteImports(src);
 	writeFileSync(join(OUT, "ui", file), rewritten);
 
@@ -150,25 +182,29 @@ for (const file of componentFiles) {
 		const hook = spec.match(/^@\/hooks\/([a-z0-9-]+)$/);
 		if (hook) registryDeps.add(`${GITHUB}/${hook[1]}`);
 	}
-	// 组件用到语义 token 与阴影，确保主题层先装。
 	registryDeps.add(`${GITHUB}/theme`);
 
-	componentItems.push({
+	return {
 		name,
 		type: "registry:ui",
 		title: pascal(name),
-		description: `Foglamp ${pascal(name)} primitive.`,
+		description,
 		...(deps.length ? { dependencies: deps } : {}),
 		registryDependencies: [...registryDeps].sort(),
 		files: [
-			{
-				path: `registry/ui/${file}`,
-				type: "registry:ui",
-				target: `@ui/${file}`,
-			},
+			{ path: `registry/ui/${file}`, type: "registry:ui", target: `@ui/${file}` },
 		],
-	});
+	};
 }
+
+const componentItems = componentFiles.map((file) =>
+	uiItem({
+		name: basename(file, ".tsx"),
+		file,
+		src: readFileSync(join(componentsDir, file), "utf8"),
+		description: `Foglamp ${pascal(basename(file, ".tsx"))} primitive.`,
+	}),
+);
 
 // ---------------------------------------------------------------------------
 // 2. lib/utils（标准 shadcn cn 实现，避免依赖 Foglamp 内部的 cn 包）
@@ -286,18 +322,116 @@ const themeCss = `/*
 writeFileSync(join(OUT, "theme/foglamp-theme.css"), themeCss);
 
 // ---------------------------------------------------------------------------
-// 5. 根 registry.json
+// 5. marketing（字体显示面 + 雾气漂移；来源为 apps/web，而非 packages/ui）
+// ---------------------------------------------------------------------------
+const marketingCssSrc = join(WEB_SRC, "index.css");
+const noiseOverlaySrc = join(WEB_SRC, "components/marketing/noise-overlay.tsx");
+if (!existsSync(marketingCssSrc) || !existsSync(noiseOverlaySrc)) {
+	console.error(
+		`找不到 marketing 源，期望：\n  ${marketingCssSrc}\n  ${noiseOverlaySrc}\n` +
+			"请用 --web <apps/web/src> 或 FOGLAMP_WEB_SRC=<apps/web/src> 指定。",
+	);
+	process.exit(1);
+}
+
+const marketingSrc = readFileSync(marketingCssSrc, "utf8");
+const fontDisplayBlock = extractBlock(marketingSrc, "@theme inline");
+const FOG_KEYFRAMES = [
+	"fog-drift-a",
+	"fog-drift-b",
+	"fog-drift-c",
+	"fog-drift-d",
+	"fog-drift-e",
+	"fog-drift-footer",
+];
+const fogKeyframes = FOG_KEYFRAMES.map((name) =>
+	extractKeyframes(marketingSrc, name),
+);
+const fogLayerBody = extractBlock(marketingSrc, ".fog-layer");
+if (
+	!fontDisplayBlock.trim() ||
+	fogKeyframes.some((k) => !k) ||
+	!fogLayerBody.trim()
+) {
+	console.error(
+		"marketing 源缺少 --font-display 映射、fog-drift keyframes 或 .fog-layer 规则。",
+	);
+	process.exit(1);
+}
+
+const marketingCss = `/*
+ * Foglamp marketing layer — self-contained.
+ * The display-face mapping, fog drift, and the .fog-layer utility, taken from
+ * apps/web/src/index.css.
+ *
+ * Usage (Tailwind v4), after the Tailwind and theme imports:
+ *   @import "./foglamp-marketing.css";
+ *
+ * Host Grotesk is not bundled. Load it and expose it as --font-host-grotesk
+ * (Next.js: next/font/google Host_Grotesk with variable: "--font-host-grotesk");
+ * nothing else resolves \`font-display\`.
+ */
+
+@theme inline {${fontDisplayBlock}}
+
+${fogKeyframes.join("\n\n")}
+
+.fog-layer {${fogLayerBody}}
+
+@media (prefers-reduced-motion: reduce) {
+	.fog-layer {
+		animation: none;
+	}
+}
+`;
+writeFileSync(join(OUT, "theme/foglamp-marketing.css"), marketingCss);
+
+const marketingItem = {
+	name: "marketing",
+	type: "registry:file",
+	title: "Foglamp Marketing",
+	description:
+		"Marketing layer: the `font-display` mapping (Host Grotesk), the fog drift keyframes, and the `.fog-layer` utility for atmospheric sections.",
+	registryDependencies: [`${GITHUB}/theme`],
+	docs: 'Add `@import "./foglamp-marketing.css";` (adjust the path) after your Tailwind and theme imports. Load Host Grotesk and expose it as `--font-host-grotesk`; nothing else resolves `font-display`.',
+	files: [
+		{
+			path: "registry/theme/foglamp-marketing.css",
+			type: "registry:file",
+			target: "@lib/foglamp-marketing.css",
+		},
+	],
+};
+
+// 雾气纹理组件（FilmGrain / FogBank / HeroGrain），与 CSS 同属 marketing 层。
+const noiseOverlayItem = uiItem({
+	name: "noise-overlay",
+	file: "noise-overlay.tsx",
+	src: readFileSync(noiseOverlaySrc, "utf8"),
+	description:
+		"Foglamp atmospheric textures: FilmGrain (static SVG speckle), FogBank (fractal-noise haze), and HeroGrain.",
+});
+
+// ---------------------------------------------------------------------------
+// 6. 根 registry.json
 // ---------------------------------------------------------------------------
 const registry = {
 	$schema: "https://ui.shadcn.com/schema/registry.json",
 	name: "foglamp",
 	homepage: "https://github.com/PakandAlive/fogui-style",
-	items: [themeItem, utilsItem, ...hookItems, ...componentItems],
+	items: [
+		themeItem,
+		marketingItem,
+		utilsItem,
+		...hookItems,
+		...componentItems,
+		noiseOverlayItem,
+	],
 };
 
 writeFileSync(join(ROOT, "registry.json"), `${JSON.stringify(registry, null, 2)}\n`);
 
 console.log(
 	`registry.json written: ${registry.items.length} items ` +
-		`(${componentItems.length} components, ${hookItems.length} hooks, 1 theme, 1 utils)`,
+		`(${componentItems.length + 1} components, ${hookItems.length} hooks, 2 theme, 1 utils)`,
 );

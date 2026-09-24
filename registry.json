@@ -22,6 +22,23 @@
       ]
     },
     {
+      "name": "marketing",
+      "type": "registry:file",
+      "title": "Foglamp Marketing",
+      "description": "Marketing layer: the `font-display` mapping (Host Grotesk), the fog drift keyframes, and the `.fog-layer` utility for atmospheric sections.",
+      "registryDependencies": [
+        "PakandAlive/fogui-style/theme"
+      ],
+      "docs": "Add `@import \"./foglamp-marketing.css\";` (adjust the path) after your Tailwind and theme imports. Load Host Grotesk and expose it as `--font-host-grotesk`; nothing else resolves `font-display`.",
+      "files": [
+        {
+          "path": "registry/theme/foglamp-marketing.css",
+          "type": "registry:file",
+          "target": "@lib/foglamp-marketing.css"
+        }
+      ]
+    },
+    {
       "name": "utils",
       "type": "registry:lib",
       "title": "cn utility",
@@ -1193,6 +1210,23 @@
           "path": "registry/ui/tooltip.tsx",
           "type": "registry:ui",
           "target": "@ui/tooltip.tsx"
+        }
+      ]
+    },
+    {
+      "name": "noise-overlay",
+      "type": "registry:ui",
+      "title": "Noise Overlay",
+      "description": "Foglamp atmospheric textures: FilmGrain (static SVG speckle), FogBank (fractal-noise haze), and HeroGrain.",
+      "registryDependencies": [
+        "PakandAlive/fogui-style/theme",
+        "PakandAlive/fogui-style/utils"
+      ],
+      "files": [
+        {
+          "path": "registry/ui/noise-overlay.tsx",
+          "type": "registry:ui",
+          "target": "@ui/noise-overlay.tsx"
         }
       ]
     }

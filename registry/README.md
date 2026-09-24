@@ -19,6 +19,12 @@ From any project that already uses **Tailwind v4 + shadcn + Base UI**:
 # Color system, shadows, radii, squircle variant, motion keyframes
 npx shadcn@latest add PakandAlive/fogui-style/theme
 
+# Marketing layer: font-display (Host Grotesk) + fog drift + .fog-layer
+npx shadcn@latest add PakandAlive/fogui-style/marketing
+
+# Marketing textures: FilmGrain / FogBank / HeroGrain
+npx shadcn@latest add PakandAlive/fogui-style/noise-overlay
+
 # cn() helper (clsx + tailwind-merge) and the useIsMobile hook
 npx shadcn@latest add PakandAlive/fogui-style/utils
 npx shadcn@latest add PakandAlive/fogui-style/use-mobile
@@ -35,6 +41,9 @@ npx shadcn@latest add PakandAlive/fogui-style/sidebar
 @import "tailwindcss";
 @import "./foglamp-theme.css"; /* adjust to where the file landed */
 ```
+
+`marketing` installs `foglamp-marketing.css` the same way; import it after the
+theme. `noise-overlay` is an ordinary component.
 
 Pin a ref for reproducibility:
 
@@ -56,8 +65,10 @@ npx shadcn@latest add PakandAlive/fogui-style/button --dry-run
 | Item | Type | Contents |
 | --- | --- | --- |
 | `theme` | `registry:file` | One self-contained CSS file: 50 light + 49 dark CSS variables (color, sidebar, chart, 18 shadow tokens), the `@theme inline` mappings, `@custom-variant` dark + squircle, `@plugin @toolwind/corner-shape`, shimmer keyframes |
+| `marketing` | `registry:file` | Marketing layer CSS: the `--font-display` mapping (Host Grotesk), the `fog-drift-*` keyframes, and the `.fog-layer` utility |
 | `utils` | `registry:lib` | `cn()` — clsx + tailwind-merge |
 | `use-mobile` | `registry:hook` | `useIsMobile()` |
+| `noise-overlay` | `registry:ui` | `FilmGrain` (static SVG speckle), `FogBank` (fractal-noise haze), `HeroGrain` |
 | 56 primitives | `registry:ui` | Every component in `registry/ui/` |
 
 Each component declares its own npm `dependencies` (e.g. `@base-ui/react`,
@@ -76,6 +87,10 @@ and installs into the consumer's configured `@ui/` / `@lib/` / `@hooks/` aliases
   come after the Tailwind import.
 - Chromium gets true squircle corners via `@toolwind/corner-shape`; other
   browsers fall back to plain rounding by design.
+- **Host Grotesk, if you use `marketing`.** The marketing item maps
+  `--font-display` to `var(--font-host-grotesk)` but does not bundle the font.
+  Load it yourself (e.g. `next/font/google` `Host_Grotesk` with
+  `variable: "--font-host-grotesk"`), or override `--font-display`.
 
 ## Caveats
 
@@ -104,16 +119,20 @@ They originate from the Foglamp repo. To pull upstream changes, run the sync
 script:
 
 ```bash
-node scripts/sync-from-foglamp.mjs --source /path/to/foglamp/packages/ui
-# or: FOGLAMP_UI_SRC=/path/to/foglamp/packages/ui node scripts/sync-from-foglamp.mjs
-# default source: ../foglamp/foglamp-src/packages/ui
+node scripts/sync-from-foglamp.mjs \
+  --source /path/to/foglamp/packages/ui \
+  --web /path/to/foglamp/apps/web/src
+# or: FOGLAMP_UI_SRC=... FOGLAMP_WEB_SRC=... node scripts/sync-from-foglamp.mjs
+# defaults: ../foglamp/foglamp-src/packages/ui and ../foglamp/foglamp-src/apps/web/src
 ```
 
 It rewrites `@foglamp/ui/*` imports to portable `@/lib/*` and
-`@/components/ui/*` aliases, extracts npm and registry dependencies, assembles a
+`@/components/ui/*` aliases, extracts npm and registry dependencies, assembles
 self-contained `registry/theme/foglamp-theme.css` (tokens + `@theme inline` +
-variants + keyframes), and regenerates `registry/ui/`, `registry/lib/`,
-`registry/hooks/`, `registry/theme/`, and `registry.json`. **It overwrites local edits to those paths** — commit before
+variants + keyframes) and `registry/theme/foglamp-marketing.css` (`font-display`
++ fog drift), copies the marketing textures to `registry/ui/noise-overlay.tsx`,
+and regenerates `registry/ui/`, `registry/lib/`, `registry/hooks/`,
+`registry/theme/`, and `registry.json`. **It overwrites local edits to those paths** — commit before
 syncing.
 
 Validate before pushing:

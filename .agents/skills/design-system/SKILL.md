@@ -46,6 +46,10 @@ npx shadcn@latest add PakandAlive/fogui-style/utils
 # 3. Any primitive, by name
 npx shadcn@latest add PakandAlive/fogui-style/button
 npx shadcn@latest add PakandAlive/fogui-style/badge
+
+# 4. Marketing pages only: display face + fog
+npx shadcn@latest add PakandAlive/fogui-style/marketing
+npx shadcn@latest add PakandAlive/fogui-style/noise-overlay
 ```
 
 Then, in order:
@@ -58,7 +62,8 @@ Then, in order:
    (`@source "../../../apps/**/*.{ts,tsx}"`). Remove them or repoint them at the
    target project. If you skip this, Tailwind generates no classes.
 3. **Wire fonts** (see `DESIGN.md` §5). Self-host Inter; add the
-   `--font-sans` / `--font-heading` mapping in `@theme inline`.
+   `--font-sans` / `--font-heading` mapping in `@theme inline`. For marketing
+   pages, load Host Grotesk as `--font-host-grotesk` (§13).
 4. **Install npm deps** declared by the installed items (`@base-ui/react`,
    `@tabler/icons-react`, `@toolwind/corner-shape`, `class-variance-authority`,
    `clsx`, `tailwind-merge`, `tw-animate-css`).
@@ -78,6 +83,8 @@ manually, copy verbatim from `registry/theme/foglamp-theme.css`.
   primitive in `registry/ui` if reused.
 - Need a component to render as another element? → Base UI `render` prop. Never
   Radix `asChild`.
+- Marketing page (landing, hero, product)? → `font-display`, and fog via
+  `.fog-layer` + `FogBank` (§13). Never in the app dashboard.
 
 ## References
 

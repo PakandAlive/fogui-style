@@ -1,0 +1,88 @@
+/*
+ * Foglamp marketing layer — self-contained.
+ * The display-face mapping, fog drift, and the .fog-layer utility, taken from
+ * apps/web/src/index.css.
+ *
+ * Usage (Tailwind v4), after the Tailwind and theme imports:
+ *   @import "./foglamp-marketing.css";
+ *
+ * Host Grotesk is not bundled. Load it and expose it as --font-host-grotesk
+ * (Next.js: next/font/google Host_Grotesk with variable: "--font-host-grotesk");
+ * nothing else resolves `font-display`.
+ */
+
+@theme inline {
+	--font-display: var(--font-host-grotesk);
+}
+
+@keyframes fog-drift-a {
+	0%,
+	100% {
+		transform: translate(-3%, -2%);
+	}
+	50% {
+		transform: translate(4%, 2%);
+	}
+}
+
+@keyframes fog-drift-b {
+	0%,
+	100% {
+		transform: translate(3%, 2%);
+	}
+	50% {
+		transform: translate(-4%, -3%);
+	}
+}
+
+@keyframes fog-drift-c {
+	0%,
+	100% {
+		transform: translate(-2%, 3%);
+	}
+	50% {
+		transform: translate(3%, -2%);
+	}
+}
+
+@keyframes fog-drift-d {
+	0%,
+	100% {
+		transform: translate(2%, -2%);
+	}
+	50% {
+		transform: translate(-3%, 3%);
+	}
+}
+
+@keyframes fog-drift-e {
+	0%,
+	100% {
+		transform: translate(-2%, 1%);
+	}
+	50% {
+		transform: translate(2%, -2%);
+	}
+}
+
+@keyframes fog-drift-footer {
+	0%,
+	100% {
+		transform: translate(-3%, -10%);
+	}
+	50% {
+		transform: translate(3%, 10%);
+	}
+}
+
+.fog-layer {
+	will-change: transform;
+	animation-timing-function: ease-in-out;
+	animation-iteration-count: infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fog-layer {
+		animation: none;
+	}
+}
