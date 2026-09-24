@@ -90,6 +90,7 @@ function isExternalDep(spec) {
 function normalizeDep(spec) {
 	if (spec === "@base-ui/react" || spec.startsWith("@base-ui/react/"))
 		return "@base-ui/react";
+	if (spec === "recharts" || spec.startsWith("recharts/")) return "recharts";
 	return spec;
 }
 
@@ -413,7 +414,78 @@ const noiseOverlayItem = uiItem({
 });
 
 // ---------------------------------------------------------------------------
-// 6. 根 registry.json
+// 6. 图表增强层 chart-plus（evilcharts 的免 motion 子集，来源 apps/web）
+//    Foglamp 产品里的图表是 apps/web 自研的 evilcharts（按主题多色 ramp、
+//    frosted tooltip、dot/background 变体、带 motion 的入场动画与 brush/zoom）。
+//    这里只抽「不依赖 motion/react 且能独立工作」的子集，作为标准 chart 之上的
+//    可选增强层：
+//      ui/chart.tsx          -> chart-plus.tsx      多色 ChartConfig + helpers
+//      ui/tooltip.tsx        -> chart-tooltip.tsx
+//      ui/legend.tsx         -> chart-legend.tsx
+//      ui/background.tsx     -> chart-background.tsx
+//      charts/donut-chart.tsx-> chart-donut.tsx
+//    ui/dot.tsx 不抽：它的填充是 url(#<id>-colors-<key>) 渐变，而该渐变由未发布的
+//    line/area/bar 包装定义，单独发布会是坏组件。
+//    带 motion 的 line/area/bar 包装与 brush/zoom 同样不发布。
+// ---------------------------------------------------------------------------
+const EVILCHARTS_DIR = join(WEB_SRC, "components/evilcharts");
+
+/** evilcharts 源文件 -> registry 文件名（加 chart- 前缀，避免与 chart/tooltip 等 item 冲突）。 */
+const CHART_FILE_MAP = {
+	"ui/chart.tsx": "chart-plus.tsx",
+	"ui/tooltip.tsx": "chart-tooltip.tsx",
+	"ui/legend.tsx": "chart-legend.tsx",
+	"ui/background.tsx": "chart-background.tsx",
+	"charts/donut-chart.tsx": "chart-donut.tsx",
+};
+
+/** 把 evilcharts 内部的 @/components/evilcharts/ui/<x> 改写为 @/components/ui/chart-*。 */
+function rewriteChartImports(src) {
+	return rewriteImports(src)
+		.replace(
+			/@\/components\/evilcharts\/ui\/chart/g,
+			"@/components/ui/chart-plus",
+		)
+		.replace(
+			/@\/components\/evilcharts\/ui\/([a-z0-9-]+)/g,
+			"@/components/ui/chart-$1",
+		);
+}
+
+rmSync(join(OUT, "charts"), { recursive: true, force: true });
+mkdirSync(join(OUT, "charts"), { recursive: true });
+
+const chartFiles = [];
+for (const [srcRel, outFile] of Object.entries(CHART_FILE_MAP)) {
+	const srcPath = join(EVILCHARTS_DIR, srcRel);
+	if (!existsSync(srcPath)) {
+		console.error(`找不到 evilcharts 源：${srcPath}`);
+		process.exit(1);
+	}
+	writeFileSync(
+		join(OUT, "charts", outFile),
+		rewriteChartImports(readFileSync(srcPath, "utf8")),
+	);
+	chartFiles.push({
+		path: `registry/charts/${outFile}`,
+		type: "registry:ui",
+		target: `@ui/${outFile}`,
+	});
+}
+
+const chartPlusItem = {
+	name: "chart-plus",
+	type: "registry:ui",
+	title: "Chart Plus",
+	description:
+		"Foglamp's chart enhancement layer: theme-aware multi-color ramps, a frosted tooltip, legend/dot/background variants, and a donut. The motion-free subset of Foglamp's internal charts, layered on top of recharts.",
+	dependencies: ["recharts"],
+	registryDependencies: [`${GITHUB}/theme`, `${GITHUB}/utils`],
+	files: chartFiles,
+};
+
+// ---------------------------------------------------------------------------
+// 7. 根 registry.json
 // ---------------------------------------------------------------------------
 const registry = {
 	$schema: "https://ui.shadcn.com/schema/registry.json",
@@ -426,6 +498,7 @@ const registry = {
 		...hookItems,
 		...componentItems,
 		noiseOverlayItem,
+		chartPlusItem,
 	],
 };
 
@@ -433,5 +506,5 @@ writeFileSync(join(ROOT, "registry.json"), `${JSON.stringify(registry, null, 2)}
 
 console.log(
 	`registry.json written: ${registry.items.length} items ` +
-		`(${componentItems.length + 1} components, ${hookItems.length} hooks, 2 theme, 1 utils)`,
+		`(${componentItems.length + 1} components, ${hookItems.length} hooks, 2 theme, 1 utils, 1 chart-plus)`,
 );

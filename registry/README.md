@@ -2,8 +2,8 @@
 
 The Foglamp design system shipped as a [shadcn GitHub registry](https://ui.shadcn.com/docs/registry/github).
 It exists so another project can reproduce the Foglamp look — color tokens,
-shadow-instead-of-border surfaces, squircle radii, and all 56 primitives —
-without copying files by hand.
+shadow-instead-of-border surfaces, squircle radii, all 56 primitives, and an
+enhanced chart layer — without copying files by hand.
 
 ## How it works
 
@@ -32,6 +32,10 @@ npx shadcn@latest add PakandAlive/fogui-style/use-mobile
 # Any primitive — its registryDependencies pull theme/utils/hooks in automatically
 npx shadcn@latest add PakandAlive/fogui-style/button
 npx shadcn@latest add PakandAlive/fogui-style/sidebar
+
+# Chart enhancement layer: theme-aware multi-color ramps, frosted tooltip,
+# legend/dot/background variants, and a donut (installs chart-*.tsx into @ui/)
+npx shadcn@latest add PakandAlive/fogui-style/chart-plus
 ```
 
 `theme` installs a self-contained `foglamp-theme.css` (into
@@ -70,11 +74,17 @@ npx shadcn@latest add PakandAlive/fogui-style/button --dry-run
 | `use-mobile` | `registry:hook` | `useIsMobile()` |
 | `noise-overlay` | `registry:ui` | `FilmGrain` (static SVG speckle), `FogBank` (fractal-noise haze), `HeroGrain` |
 | 56 primitives | `registry:ui` | Every component in `registry/ui/` |
+| `chart-plus` | `registry:ui` | Six files (`chart-plus`, `chart-tooltip`, `chart-legend`, `chart-dot`, `chart-background`, `chart-donut`): Foglamp's chart enhancement layer, the motion-free subset of its internal charts |
 
 Each component declares its own npm `dependencies` (e.g. `@base-ui/react`,
 `@tabler/icons-react`, `cmdk`, `recharts`, `vaul`, `embla-carousel-react`), its
 `registryDependencies` (other primitives it imports, plus `theme` and `utils`),
 and installs into the consumer's configured `@ui/` / `@lib/` / `@hooks/` aliases.
+
+The standard `chart` primitive (a plain shadcn/recharts wrapper, mirroring
+`packages/ui`) and `chart-plus` are independent — use either, not both. The
+former is the design-system baseline; the latter reproduces the charts Foglamp
+actually renders. See the skill's `references/charts.md`.
 
 ## Requirements in the target project
 
@@ -131,8 +141,9 @@ It rewrites `@foglamp/ui/*` imports to portable `@/lib/*` and
 self-contained `registry/theme/foglamp-theme.css` (tokens + `@theme inline` +
 variants + keyframes) and `registry/theme/foglamp-marketing.css` (`font-display`
 + fog drift), copies the marketing textures to `registry/ui/noise-overlay.tsx`,
-and regenerates `registry/ui/`, `registry/lib/`, `registry/hooks/`,
-`registry/theme/`, and `registry.json`. **It overwrites local edits to those paths** — commit before
+portions the motion-free subset of `apps/web`'s charts to `registry/charts/`,
+and regenerates `registry/ui/`, `registry/charts/`, `registry/lib/`,
+`registry/hooks/`, `registry/theme/`, and `registry.json`. **It overwrites local edits to those paths** — commit before
 syncing.
 
 Validate before pushing:

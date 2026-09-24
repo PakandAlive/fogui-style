@@ -2,8 +2,8 @@
 
 The Foglamp design system, packaged for reuse. Near-monochrome OKLCH color
 tokens, a shadow-instead-of-border surface model, squircle radii, Tabler filled
-icons, and 56 Base UI + CVA primitives — extracted from the Foglamp app so any
-project can reproduce the same look.
+icons, 56 Base UI + CVA primitives, and an enhanced chart layer — extracted from
+the Foglamp app so any project can reproduce the same look.
 
 This repository is the system's **independent home**. It is self-contained: the
 files under `registry/` are the source of truth, not a build artifact.
@@ -14,10 +14,10 @@ files under `registry/` are the source of truth, not a build artifact.
 | --- | --- |
 | `DESIGN.md` | The authoritative design-system document — philosophy, color, shadows, radii, type, icons, component matrix, anti-patterns. |
 | `.agents/skills/fogui-style/` | Self-contained agent skill that enforces the rules when building UI (`SKILL.md` + 9 references: troubleshooting, colors, shadows, typography, icons, charts, components, anti-patterns, marketing). |
-| `registry.json` | A shadcn GitHub registry — 61 items (theme, marketing, utils, use-mobile, 56 primitives, `noise-overlay`). |
+| `registry.json` | A shadcn GitHub registry — 62 items (theme, marketing, utils, use-mobile, 56 primitives, `noise-overlay`, `chart-plus`). |
 | `registry/theme/foglamp-theme.css` | The theme layer: tokens, shadows, squircle variant, keyframes. |
 | `registry/theme/foglamp-marketing.css` | The marketing layer: `font-display` (Host Grotesk), fog drift keyframes, `.fog-layer`. |
-| `registry/ui/`, `registry/lib/`, `registry/hooks/` | Distributable components (incl. `noise-overlay`), `cn()`, and hooks. |
+| `registry/ui/`, `registry/charts/`, `registry/lib/`, `registry/hooks/` | Distributable components (incl. `noise-overlay`), the `chart-plus` layer, `cn()`, and hooks. |
 | `scripts/sync-from-foglamp.mjs` | Optional tool to pull upstream changes from the Foglamp repo. |
 
 ## Use it
@@ -40,6 +40,10 @@ npx shadcn@latest add PakandAlive/fogui-style/use-mobile
 # Any primitive — dependencies resolve automatically
 npx shadcn@latest add PakandAlive/fogui-style/button
 npx shadcn@latest add PakandAlive/fogui-style/sidebar
+
+# Chart enhancement layer (theme-aware multi-color ramps, frosted tooltip,
+# legend/dot/background variants, donut)
+npx shadcn@latest add PakandAlive/fogui-style/chart-plus
 ```
 
 `theme` and `marketing` land self-contained CSS files; import them once after

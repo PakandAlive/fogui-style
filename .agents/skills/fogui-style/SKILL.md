@@ -100,8 +100,9 @@ before debugging from scratch.
   primitive if reused.
 - Need a component to render as another element? → Base UI `render` prop. Never
   Radix `asChild`.
-- Need a chart? → the `chart` primitive (recharts), grayscale `var(--chart-N)`
-  only. Charts may use `border`/`stroke-*` internally — see `references/charts.md`.
+- Need a chart? → `chart-plus` for the real Foglamp look, or the plain `chart`
+  baseline; pick one. Always the grayscale `var(--chart-N)` ramp. Charts may use
+  `border`/`stroke-*` internally — see `references/charts.md`.
 - Marketing page (landing, hero, product)? → `font-display`, and fog via
   `.fog-layer` + `FogBank`. Never in the app dashboard.
 

@@ -1229,6 +1229,46 @@
           "target": "@ui/noise-overlay.tsx"
         }
       ]
+    },
+    {
+      "name": "chart-plus",
+      "type": "registry:ui",
+      "title": "Chart Plus",
+      "description": "Foglamp's chart enhancement layer: theme-aware multi-color ramps, a frosted tooltip, legend/dot/background variants, and a donut. The motion-free subset of Foglamp's internal charts, layered on top of recharts.",
+      "dependencies": [
+        "recharts"
+      ],
+      "registryDependencies": [
+        "PakandAlive/fogui-style/theme",
+        "PakandAlive/fogui-style/utils"
+      ],
+      "files": [
+        {
+          "path": "registry/charts/chart-plus.tsx",
+          "type": "registry:ui",
+          "target": "@ui/chart-plus.tsx"
+        },
+        {
+          "path": "registry/charts/chart-tooltip.tsx",
+          "type": "registry:ui",
+          "target": "@ui/chart-tooltip.tsx"
+        },
+        {
+          "path": "registry/charts/chart-legend.tsx",
+          "type": "registry:ui",
+          "target": "@ui/chart-legend.tsx"
+        },
+        {
+          "path": "registry/charts/chart-background.tsx",
+          "type": "registry:ui",
+          "target": "@ui/chart-background.tsx"
+        },
+        {
+          "path": "registry/charts/chart-donut.tsx",
+          "type": "registry:ui",
+          "target": "@ui/chart-donut.tsx"
+        }
+      ]
     }
   ]
 }
