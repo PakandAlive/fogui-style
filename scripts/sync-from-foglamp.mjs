@@ -478,7 +478,7 @@ const chartPlusItem = {
 	type: "registry:ui",
 	title: "Chart Plus",
 	description:
-		"Foglamp's chart enhancement layer: theme-aware multi-color ramps, a frosted tooltip, legend/dot/background variants, and a donut. The motion-free subset of Foglamp's internal charts, layered on top of recharts.",
+		"Foglamp's chart enhancement layer: theme-aware multi-color ramps, a frosted tooltip, seven legend variants, SVG background patterns, and a donut. The motion-free, self-contained subset of Foglamp's internal charts, layered on top of recharts.",
 	dependencies: ["recharts"],
 	registryDependencies: [`${GITHUB}/theme`, `${GITHUB}/utils`],
 	files: chartFiles,

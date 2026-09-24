@@ -74,7 +74,7 @@ npx shadcn@latest add PakandAlive/fogui-style/button --dry-run
 | `use-mobile` | `registry:hook` | `useIsMobile()` |
 | `noise-overlay` | `registry:ui` | `FilmGrain` (static SVG speckle), `FogBank` (fractal-noise haze), `HeroGrain` |
 | 56 primitives | `registry:ui` | Every component in `registry/ui/` |
-| `chart-plus` | `registry:ui` | Six files (`chart-plus`, `chart-tooltip`, `chart-legend`, `chart-dot`, `chart-background`, `chart-donut`): Foglamp's chart enhancement layer, the motion-free subset of its internal charts |
+| `chart-plus` | `registry:ui` | Five files (`chart-plus`, `chart-tooltip`, `chart-legend`, `chart-background`, `chart-donut`): Foglamp's chart enhancement layer, the motion-free, self-contained subset of its internal charts |
 
 Each component declares its own npm `dependencies` (e.g. `@base-ui/react`,
 `@tabler/icons-react`, `cmdk`, `recharts`, `vaul`, `embla-carousel-react`), its
