@@ -145,6 +145,20 @@ Cause: you copied Foglamp's whole `globals.css`, which carries monorepo paths
 Fix: remove them, or repoint at this project:
 `@source "../app/**/*.{ts,tsx}";`. Do not add `@source` for node_modules.
 
+### A colored Badge or `shadow-(--custom-shadow-*)` has no shadow
+
+Symptom: colored chips/badges render with no edge shadow; some
+`--custom-shadow-*` tokens read as empty.
+
+Cause: the theme was not installed verbatim — an older snapshot, or a
+hand-copied token block that dropped tokens.
+
+Fix: reinstall the `theme` item, then confirm they resolve:
+
+```js
+getComputedStyle(document.documentElement).getPropertyValue("--custom-shadow-rose");
+```
+
 ### Animations do nothing (`animate-in`, `fade-in`, …)
 
 Cause: `tw-animate-css` is a dependency but never imported.

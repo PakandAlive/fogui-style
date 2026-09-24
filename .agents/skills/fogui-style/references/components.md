@@ -53,6 +53,31 @@ Sizes (3): `sm h-4 text-[10px]`, `md h-5 text-xs`, `lg h-6 text-sm`.
 
 Add an icon alongside the text where it clarifies state.
 
+## Colored chips, tags, and ranks
+
+The hue set lives in the `Badge` variants — `green blue amber orange emerald rose
+red violet fuchsia sky`, plus `default secondary destructive outline`. Each
+variant already bundles the tinted surface, the paired text color, and the
+matching `--custom-shadow-*` edge. Do not rebuild it inline.
+
+- Category / status chip → `<Badge variant="rose" size="sm">{label}</Badge>`.
+- Hashtag / tag → neutral: `bg-secondary/60 text-secondary-foreground`, or a
+  `secondary` Badge. One neutral treatment, not a rainbow.
+- Leaderboard / heat rank → `text-muted-foreground` for the number, at most one
+  accent for #1. Never `text-amber-500` / `text-emerald-500` / `text-rose-500`.
+- Need a hue the variants do not cover? Add a Badge variant — do not inline
+  `bg-<hue>-500`.
+
+## Contrast
+
+- Text must hit 4.5:1. `--muted-foreground` is fine at ≥ 12px on
+  `--background` / `--card`; at `text-[11px]` or on a tinted surface it often
+  fails.
+- Never dim text with `/60` or `/70` opacity — pick a token that already has the
+  contrast.
+- Colored badge text is tuned for its own tinted surface; keep the `Badge`
+  variant instead of restyling the colors by hand.
+
 ## Other primitives — noteworthy conventions
 
 - **Input with icon/prefix/suffix:** always `InputGroup`

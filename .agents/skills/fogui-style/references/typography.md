@@ -37,6 +37,13 @@ Rules:
   // <html className={inter.variable}>
   ```
 
+- **Verify it landed.** If the dashboard renders in a system stack,
+  `--font-sans` was never set:
+
+  ```js
+  getComputedStyle(document.body).fontFamily; // must contain "Inter"
+  ```
+
 - Self-host Inter from the canonical rsms/inter release, not Google Fonts
   (Google serves an older, feature-stripped build).
 - The dashboard is Inter everywhere. `font-display` is marketing only.
