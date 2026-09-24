@@ -10,8 +10,8 @@ files win — then fix this document.
 
 This file is written to be **portable**. A new project should be able to read it
 top to bottom and reproduce the same look. The machine-readable counterpart
-lives in `registry.json`; the AI-facing counterpart lives in
-`.agents/skills/design-system/`.
+lives in `registry.json`; the AI-facing counterpart is the self-contained skill
+in `.agents/skills/fogui-style/`.
 
 ---
 

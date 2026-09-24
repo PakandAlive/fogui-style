@@ -1,6 +1,6 @@
 # Color tokens
 
-Source: `registry/theme/foglamp-theme.css`. All values are OKLCH. Copy verbatim.
+These are the values shipped by the `theme` item. All values are OKLCH.
 
 ## Base semantic tokens
 

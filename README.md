@@ -13,7 +13,7 @@ files under `registry/` are the source of truth, not a build artifact.
 | Path | What it is |
 | --- | --- |
 | `DESIGN.md` | The authoritative design-system document — philosophy, color, shadows, radii, type, icons, component matrix, anti-patterns. |
-| `.agents/skills/design-system/` | An agent skill that enforces the rules when building UI (`SKILL.md` + color/shadow references). |
+| `.agents/skills/fogui-style/` | Self-contained agent skill that enforces the rules when building UI (`SKILL.md` + 7 references: colors, shadows, typography, icons, components, anti-patterns, marketing). |
 | `registry.json` | A shadcn GitHub registry — 61 items (theme, marketing, utils, use-mobile, 56 primitives, `noise-overlay`). |
 | `registry/theme/foglamp-theme.css` | The theme layer: tokens, shadows, squircle variant, keyframes. |
 | `registry/theme/foglamp-marketing.css` | The marketing layer: `font-display` (Host Grotesk), fog drift keyframes, `.fog-layer`. |
@@ -51,14 +51,31 @@ Tailwind (`marketing` after `theme`):
 @import "./foglamp-marketing.css";
 ```
 
-Then read `DESIGN.md` (or load the skill) before writing UI. The four laws:
+Then read `DESIGN.md` (or load the skill) before writing UI. The five laws:
 
 1. Near-monochrome base; color only in badge variants.
 2. Separate surfaces with a shadow token, never a border.
 3. One radius, squircle-aware; buttons/badges are fully round.
 4. Filled Tabler icons first, default `size-3.5`.
+5. Token or nothing; never hardcode color in a className.
 
 See `registry/README.md` for the full item map, requirements, and caveats.
+
+## Agent skill
+
+`.agents/skills/fogui-style/` is a self-contained skill: it references only its
+own `references/`, so it works outside this repository. Install it once, globally,
+and every project can load it:
+
+```bash
+mkdir -p ~/.config/opencode/skills
+cp -r .agents/skills/fogui-style ~/.config/opencode/skills/
+```
+
+The skill ID is `fogui-style` (the directory name). Ask the agent to use the
+`fogui-style` skill, or let it discover the skill from its `description`.
+Alternative locations OpenCode scans: `~/.claude/skills`, `~/.agents/skills`
+(global) and `.opencode/skills`, `.claude/skills`, `.agents/skills` (project).
 
 ## Relationship to Foglamp
 
@@ -68,7 +85,9 @@ The components and tokens originate from the
 you want upstream changes:
 
 ```bash
-node scripts/sync-from-foglamp.mjs --source /path/to/foglamp/packages/ui
+node scripts/sync-from-foglamp.mjs \
+  --source /path/to/foglamp/packages/ui \
+  --web /path/to/foglamp/apps/web/src
 ```
 
 The script rewrites `@foglamp/ui/*` imports to portable aliases and regenerates

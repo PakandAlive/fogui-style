@@ -1,6 +1,6 @@
 # Shadow tokens
 
-Source: `registry/theme/foglamp-theme.css`. Foglamp separates surfaces with
+These are the values shipped by the `theme` item. Foglamp separates surfaces with
 shadows instead of borders. Every stack starts with a `0 0 0 0.5px` ring (a
 hairline) and adds depth. Light and dark stacks differ — never reuse one for the
 other.
