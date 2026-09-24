@@ -1,0 +1,6 @@
+node_modules
+.DS_Store
+*.log
+
+# shadcn build output (validate-only; the GitHub registry reads source directly)
+public/r
