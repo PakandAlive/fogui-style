@@ -13,7 +13,7 @@ files under `registry/` are the source of truth, not a build artifact.
 | Path | What it is |
 | --- | --- |
 | `DESIGN.md` | The authoritative design-system document — philosophy, color, shadows, radii, type, icons, component matrix, anti-patterns. |
-| `.agents/skills/fogui-style/` | Self-contained agent skill that enforces the rules when building UI (`SKILL.md` + 8 references: troubleshooting, colors, shadows, typography, icons, components, anti-patterns, marketing). |
+| `.agents/skills/fogui-style/` | Self-contained agent skill that enforces the rules when building UI (`SKILL.md` + 9 references: troubleshooting, colors, shadows, typography, icons, charts, components, anti-patterns, marketing). |
 | `registry.json` | A shadcn GitHub registry — 61 items (theme, marketing, utils, use-mobile, 56 primitives, `noise-overlay`). |
 | `registry/theme/foglamp-theme.css` | The theme layer: tokens, shadows, squircle variant, keyframes. |
 | `registry/theme/foglamp-marketing.css` | The marketing layer: `font-display` (Host Grotesk), fog drift keyframes, `.fog-layer`. |

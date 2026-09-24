@@ -100,6 +100,8 @@ before debugging from scratch.
   primitive if reused.
 - Need a component to render as another element? → Base UI `render` prop. Never
   Radix `asChild`.
+- Need a chart? → the `chart` primitive (recharts), grayscale `var(--chart-N)`
+  only. Charts may use `border`/`stroke-*` internally — see `references/charts.md`.
 - Marketing page (landing, hero, product)? → `font-display`, and fog via
   `.fog-layer` + `FogBank`. Never in the app dashboard.
 
@@ -111,7 +113,8 @@ Read the one a task points at; each is self-contained.
 - `references/colors.md` — token tables (base, sidebar, chart, badge accents).
 - `references/shadows.md` — every shadow token, its values, and the border rule.
 - `references/typography.md` — the three faces and where each is allowed.
-- `references/icons.md` — Tabler rules and sizing.
+- `references/icons.md` — Tabler rules, color, sizing, accessibility.
+- `references/charts.md` — the chart primitive, the grayscale ramp, the border exception.
 - `references/components.md` — inventory, Button/Badge, composition, spacing, motion.
 - `references/anti-patterns.md` — the hard-ban table.
 - `references/marketing.md` — the display face and the fog atmosphere.

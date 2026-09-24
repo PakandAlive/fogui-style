@@ -88,6 +88,8 @@ matching `--custom-shadow-*` edge. Do not rebuild it inline.
   (`h-svh min-h-0` on provider, `overflow-hidden` on inset, `overflow-y-auto`
   on inner main).
 - **Tables:** the `<Table>` primitive. No TanStack Table / AG Grid.
+- **Charts:** the `chart` primitive (recharts), grayscale `var(--chart-N)` only.
+  See `references/charts.md` — charts are the one sanctioned `border` exception.
 - **Dialogs:** the `<Dialog>` primitive. No custom overlay/portal logic.
 - **Loading / empty:** `<Skeleton>` for placeholders, `<Empty>` for zero-states,
   `<IconLoader2 className="size-4 animate-spin" />` for spinners. Never render a
